@@ -3,4 +3,6 @@ group_id=24
 # ID Шаблону який підлючаємо до вузла
 template_id=10081
 # відобраєемо їм'я вузла
-visible_name=""
+visible_name="Дім Упаковки, ТОВ"
+engineer="Дєньгін"
+cloud="uCLoud"

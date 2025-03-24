@@ -1,4 +1,4 @@
-# version - 0.1a
+# version - 0.3a
 # Add host to zabbix Server via API
 # Anatolii Dienhin
 # anatoliydengin@gmail.com
@@ -6,6 +6,7 @@
 import requests
 import json
 import socket
+import os
 
 # -- Dict config
 config = {}
@@ -37,10 +38,12 @@ ip = requests.get('https://api.ipify.org').content.decode('utf8')
 
 # === Дані для нового вузла ===
 visibl = config["visible_name"]
+cloud = config["cloud"]
+engineer = config["engineer"]
 if not visibl:
     visibl = input("Компанію не знайдено, введіть нову назву компаії: ")
 host_name = socket.gethostname()  # Ім'я вузла
-visible_name = f"{visibl}Windows.RDS.Server.uCloud.NOT-AO"  # Видиме ім'я (відображається у Zabbix UI)
+visible_name = f"{visibl}Windows.RDS.Server.{cloud}.{engineer}"  # Видиме ім'я (відображається у Zabbix UI)
 group_id = config["group_id"]  # ID групи 
 template_id = config["template_id"]  # ID шаблону (наприклад, "Template OS Linux")
 ip_address = ip  # IP вузла
@@ -74,5 +77,13 @@ result = response.json()
 
 if "result" in result:
     print(f"✅ Вузол '{host_name}' успішно створений! (ID: {result['result']['hostids'][0]})")
+    # Видаляємо завдання ZabbixAddHost із планувальника
+    task_name = "ZabbixAddHost"
+    delete_command = f'schtasks /delete /tn "{task_name}" /f'
+
+    # Виконуємо команду
+    os.system(delete_command)
+    
+    print(f"Завдання {task_name} успішно видалено з планувальника.")
 else:
     print(f"❌ Помилка: {result}")
